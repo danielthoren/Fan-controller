@@ -33,7 +33,7 @@ entity fan is
 			rst: 			in std_logic;				--Reset
 			half_sec_clk: 		in std_logic;				--Clock with 2Hz rate (high flank every 0.5 seconds). Used to measure speed
 			tacho: 			in std_logic;				--Tachometer input
-			duty_cycle: 		in std_logic_vector(4 downto 0);	--Dutycycle of pwm, decimal value between 0 and 20 (unsigned)
+			duty_cycle: 		in std_logic_vector(4 downto 0);	--Dutycycle of pwm, decimal value between 0 and 21 (unsigned)
 
 			pwm_signal: 		out std_logic;				--PWM output
 			pulses_sec: 		out std_logic_vector(7 downto 0)	--Pulses per second, used to calculate fan speed (RPM = pulses_sec * 60)
@@ -92,11 +92,13 @@ begin
 		end if;
 		
 		if pwm_counter = unsigned(duty_cycle) then
-			pwm_signal <= '1';
+			pwm_signal <= '0';
 		end if;
 			
 		if pwm_counter = "10100" then 
-			pwm_signal <= '0';
+			if not(unsigned(duty_cycle) = 0) then
+			 	pwm_signal <= '1';
+			end if;
 			pwm_counter <= (others=>'0');
 		end if;
 	

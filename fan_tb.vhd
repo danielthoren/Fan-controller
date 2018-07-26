@@ -9,7 +9,7 @@ architecture behave of fan_tb is
 	signal i_rst: 		std_logic := '0';
 	signal i_half_sec_clk: 	std_logic := '0';
 	signal i_tacho:		std_logic := '0';
-	signal i_duty_cycle:	std_logic_vector(4 downto 0) := "01010";
+	signal i_duty_cycle:	std_logic_vector(4 downto 0) := "00000";
 
 	signal o_pwm_signal:	std_logic := '0';
 	signal o_pulses_sec:	std_logic_vector(7 downto 0) := (others=>'0');
@@ -65,10 +65,14 @@ begin
 
 	process is
 	begin
+	wait for 1ms;
+	i_duty_cycle <= "00100";	--25% (4)
 	wait for 1 ms;
-	i_duty_cycle <= "00101";
+	i_duty_cycle <= "01001";	--50% (9)
 	wait for 1 ms;
-		
+	i_duty_cycle <= "01110";	--75% (14)
+	wait for 1 ms;
+	i_duty_cycle <= "10011";	--100% (19)
 
 	end process;
 end behave;
