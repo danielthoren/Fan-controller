@@ -1,8 +1,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-entity shift_register is
-end shift_register;
+entity shift_register_tb is
+end shift_register_tb;
 
 architecture behave of shift_register_tb is
 
@@ -41,8 +41,8 @@ component shift_register is
 		rst:		in std_logic;
 	   	data_in:	in std_logic_vector(7 downto 0);
 
-           	data_out: 	out std_logic_vector(7 downto 0)
-		shift_in	out std_logic);
+           	data_out: 	out std_logic_vector(7 downto 0);
+		shift_out:	out std_logic);
 end component;
 
 begin
@@ -61,7 +61,8 @@ begin
 			rst => i_rst,
 			data_in => i_data_in,
 			data_out => i_data_out,
-			shift_out => i_shift_out
+			shift_out => i_shift_out,
+			write_enable => i_write_enable
 			);
 
 	process is
@@ -70,7 +71,7 @@ begin
 		--setting write_enable = '0'
 		i_data_in <= "10101010";
 		i_write_enable <= '0';
-		rst <= '0';
+		i_rst <= '0';
 		i_shift <= '1';
 		i_shift_in <= '0';
 		wait for 10ns;
@@ -86,7 +87,7 @@ begin
 		i_shift_in <= '0';
 
 		wait for 5ns;
-		rst <= '1';
+		i_rst <= '1';
 		wait for 5ns;
 	end process;
 end behave;
