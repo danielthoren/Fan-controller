@@ -10,7 +10,8 @@ entity shift_register is
 		rst:		in std_logic;
 	   	data_in:	in std_logic_vector(7 downto 0);
 
-           	data_out: 	out std_logic_vector(7 downto 0));
+           	data_out: 	out std_logic_vector(7 downto 0);
+		shift_out:	out std_logic);
 end shift_register;
 
 architecture Behavioral of shift_register is
@@ -34,6 +35,7 @@ begin
 		end if;
 
 		if shift = '1' then
+			shift_out <= shift_reg(0);
             		shift_reg(6 downto 0) <= shift_reg(7 downto 1);
             		shift_reg(7) <= shift_in;
         	end if;

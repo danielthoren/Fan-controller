@@ -62,6 +62,17 @@ begin
 				data_in => data_out;
 				data_out => in_reg_data;
 			);
+
+	in_reg : shift_register
+		port map(
+				shift => shift_in;
+				shift_in => '0';
+				write_enable => wr_in;
+				clk => clk;
+				rst => rst;	
+				data_in => data_out;
+				data_out => in_reg_data;
+			);
 				
 
 
