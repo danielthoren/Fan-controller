@@ -32,10 +32,9 @@ signal byte_counter:	unsigned(2 downto 0) := (others=>'0');
 signal recieving:	std_logic := '0';
 signal shift_in:	std_logic := '0';
 signal wr_in:		std_logic := '0';
-signal in_reg_data:	std_logic_vector(7 downto 0) => (others=>'0');
+signal in_reg_data:	std_logic_vector(7 downto 0) := (others=>'0');
 
 signal transmitting:	std_logic := '0';
-signal shift_out	std_logic := '0';
 signal wr_out:		std_logic :='0';
 signal out_reg_data:	std_logic_vector(7 downto 0) := (others=>'0');
 
@@ -45,36 +44,36 @@ component shift_register is
 		shift_in:	in std_logic;			--Data that is shifted in
 		write_enable:	in std_logic;			--writes 'data_in' to 'shift_reg' when high
            	clk: 		in std_logic;
+		rst:		in std_logic;
 	   	data_in:	in std_logic_vector(7 downto 0);
 
-           	data_out: 	out std_logic_vector(7 downto 0));
+           	data_out: 	out std_logic_vector(7 downto 0)
 	); 
+end component;
 
 begin
 
 	in_reg : shift_register
 		port map(
-				shift => shift_in;
-				shift_in => '0';
-				write_enable => wr_in;
-				clk => clk;
-				rst => rst;	
-				data_in => data_out;
-				data_out => in_reg_data;
+				shift => shift_in,
+				shift_in => '0',
+				write_enable => wr_in,
+				clk => clk,
+				rst => rst,
+				data_in => (others=>'0'),
+				data_out => in_reg_data
 			);
 
-	in_reg : shift_register
+	out_reg : shift_register
 		port map(
-				shift => shift_in;
-				shift_in => '0';
-				write_enable => wr_in;
-				clk => clk;
-				rst => rst;	
-				data_in => data_out;
-				data_out => in_reg_data;
+				shift => shift_in,
+				shift_in => '0',
+				write_enable => wr_out,
+				clk => clk,
+				rst => rst,
+				data_in => data_out,
+				data_out => out_reg_data
 			);
-				
-
 
 
 
