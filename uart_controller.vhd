@@ -26,9 +26,11 @@ end uart_reciever;
 
 architecture behave of uart_reciever is
 
-signal bit_counter:	unsigned(2 downto 0) := (others=>'0');
+signal baud_counter:	unsigned(2 downto 0) := (others=>'0');
 signal byte_counter:	unsigned(2 downto 0) := (others=>'0');
+signal baud_clock:	std_logic := 0;
 
+signal sampled_input:	std_logic := '1';
 signal recieving:	std_logic := '0';
 signal shift_in:	std_logic := '0';
 signal wr_in:		std_logic := '0';
@@ -79,6 +81,43 @@ begin
 
 	data_out <= data_out_int;
 
+	process(clk, rst)
+	begin
+		if rising_edge(clk) then
+			baud_counter <= baud_counter + 1;	--Keeping track of when baud clock is
 
+			--Sampling signal if in middle of baud clock (=4)
+			if baud_counter = "100" then
+				sample_input <= data_recieved;
+			end if;
+
+			--Baud clock event, handle transfer logic
+			if baud_counter = "111" then
+				baud_counter <= "000";
+
+				--If in recieving state, handle recieve logic
+				if recieving = '1' then
+					if byte_counter < 7 then
+						byte_counter <= byte_counter + 1;
+						shift_in <= sample_input;		--shift in recieved bit to in_reg
+					else
+
+				elsif sample_input = '1' then
+					recieving <= '1';
+					byte_counter <= "000";
+				end if;
+			end if;
+				
+
+		end if;
+	end process;
+
+	process(clk)
+	begin
+		if rising_edge(clk) then
+			if baude_counter = "111" then
+				baud_counter = 
+		end if;
+	end process;
 
 end behave;

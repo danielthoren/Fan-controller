@@ -66,7 +66,7 @@ begin
 		end if;
 	end if;
 
-	--Not synchronized using 'clk' since 'half_sec_clk' is synchronized already
+	--Not synchronized by 'clk' since 'half_sec_clk' is synchronized already
 	if rising_edge(half_sec_clk) then
 		pulses_sec <= std_logic_vector(tacho_counter);
 		tacho_counter <= (others=>'0');
@@ -81,7 +81,7 @@ end process;
 --@rst: Resets pwm driver.
 --@pwm_counter: 5-bit counter used to generate pwm signal.
 --@duty_cycle: 5-bit 'std_logic_vector' holding a binary value between 0 and 20 (unsigned value)
-pwm: process(clk, rst, pwm_counter, duty_cycle)
+pwm: process(clk, rst)
 begin
 	if rising_edge(clk) then
 		pwm_counter <= pwm_counter + 1;
