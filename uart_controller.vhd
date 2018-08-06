@@ -38,6 +38,8 @@ signal transmitting:	std_logic := '0';
 signal wr_out:		std_logic :='0';
 signal out_reg_data:	std_logic_vector(7 downto 0) := (others=>'0');
 
+signal data_out_int:	std_logic_vector(7 downto 0) := (others=>'0');		--Internal signal for data out, used as a buffer between this entity and out_reg
+
 component shift_register is
 	port(
 		shift:		in std_logic;			--Shift register if high (every clock)
@@ -71,9 +73,11 @@ begin
 				write_enable => wr_out,
 				clk => clk,
 				rst => rst,
-				data_in => data_out,
+				data_in => data_out_int,
 				data_out => out_reg_data
 			);
+
+	data_out <= data_out_int;
 
 
 
