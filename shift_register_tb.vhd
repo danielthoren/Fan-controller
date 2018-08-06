@@ -31,7 +31,6 @@ architecture behave of shift_register_tb is
 	signal i_data_in:	std_logic_vector(7 downto 0);
 		
 	signal i_data_out:	std_logic_vector(7 downto 0);
-	signal i_shift_out:	std_logic;
 
 component shift_register is
     Port ( 	shift:		in std_logic;			--Shift register if high (not synchronized)
@@ -41,8 +40,7 @@ component shift_register is
 		rst:		in std_logic;
 	   	data_in:	in std_logic_vector(7 downto 0);
 
-           	data_out: 	out std_logic_vector(7 downto 0);
-		shift_out:	out std_logic);
+           	data_out: 	out std_logic_vector(7 downto 0));
 end component;
 
 begin
@@ -61,7 +59,6 @@ begin
 			rst => i_rst,
 			data_in => i_data_in,
 			data_out => i_data_out,
-			shift_out => i_shift_out,
 			write_enable => i_write_enable
 			);
 
@@ -72,23 +69,22 @@ begin
 		i_data_in <= "10101010";
 		i_write_enable <= '0';
 		i_rst <= '0';
-		i_shift <= '1';
 		i_shift_in <= '0';
-		wait for 10ns;
+		wait for 20us;
 	
 		--write data ro in register
 		i_write_enable <= '1';
-		wait for 1ns;		
+		wait for 20us;
 		i_write_enable <= '0';
+		i_data_in <= "00000000";
 
-		wait for 5ns;
 		i_shift_in <= '1';
-		wait for 5ns;
+		i_shift <= '1';	
+		wait for 160us;
 		i_shift_in <= '0';
 
-		wait for 5ns;
-		i_rst <= '1';
-		wait for 5ns;
+		wait for 160us;
+		std.env.stop;
 	end process;
 end behave;
 
