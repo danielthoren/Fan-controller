@@ -20,6 +20,9 @@ end fan_controller;
 
 architecture behave of fan_controller is
 
+	signal sending_fan_data:	std_logic := '0';			--high when sending data, continues to be high untill data for all 8 fans has been sent, then set to low
+	signal fan_data_counter:	unsigned(7 downto 0) := (others=>'0');	--Counter for wich data is sent
+	
 	--Clock signals and dividers
 	signal uart_clk:		std_logic;		--clock for uart logic (6MHz / 5 = 1.2MHz -> 125 clocks per bit at 9600bps)
 	signal uart_clk_counter:	unsigned(2 downto 0);	--counter for uart divider
@@ -41,6 +44,9 @@ architecture behave of fan_controller is
 	signal fans_pulses_sec:		std_logic_vector(63 downto 0);	--internal fans speed in rotations per seconds
 
 component uart_rx is
+	generic (
+      		g_CLKS_PER_BIT : integer := 125   -- Needs to be set correctly
+      	);
 	port(
 			i_Clk:			in std_logic;
 			i_RX_Serial:		in std_logic;
@@ -50,6 +56,9 @@ component uart_rx is
 end component;
 
 component uart_tx is
+	generic (
+      		g_CLKS_PER_BIT : integer := 125   -- Needs to be set correctly
+      	);
 	port(
 			i_Clk:			in std_logic;
 			i_TX_DV:		in std_logic;				--write enable, write new data to out reg if high
@@ -106,11 +115,99 @@ begin
 			pulses_sec => fans_pulses_sec(7 downto 0)
 			);
 	
+	--Handles input/output logic. Sets the duty cycle of fans from the input data and sends data
+	--on high flank of half_second_clock
+	input_logic: process(uart_clk, half_sec_clk)
+	begin
+
+		--Sets the 'sending_fan_data' state signal to high indicating that it is time to send
+		--speed data to computer
+		if rising_edge(half_sec_clk) then
+			sending_fan_data <= '1';
+		end if;
+
+		--Handle input/output data
+		if rising_edge(uart_clk) then
+
+			--reset process
+			if (rst = '1') then
+				fan_data_counter <= (others=>'0');
+				sending_fan_data <= '0';
+				tx_wr_enable <= '0';
+				tx_data <= (others=>'0');
+				fans_duty_cycle <= (others=>'0');
+				half_sec_counter <= (others=>'0');
+			end if;
+
+			if rx_new_data = '1' then
+				case rx_data(2 downto 0) is
+					when "000" =>
+						fans_duty_cycle(4 downto 0) <= rx_data(4 downto 0);
+					when "001" =>
+						fans_duty_cycle(9 downto 5) <= rx_data(4 downto 0);
+					when "010" =>
+						fans_duty_cycle(14 downto 10) <= rx_data(4 downto 0);
+					when "011" =>
+						fans_duty_cycle(19 downto 15) <= rx_data(4 downto 0);
+					when "100" =>
+						fans_duty_cycle(24 downto 20) <= rx_data(4 downto 0);
+					when "101" =>
+						fans_duty_cycle(29 downto 25) <= rx_data(4 downto 0);
+					when "110" =>
+						fans_duty_cycle(34 downto 30) <= rx_data(4 downto 0);
+					when "111" =>
+						fans_duty_cycle(39 downto 35) <= rx_data(4 downto 0);
+					when others =>
+				end case;
+			end if;
+
+
+
+			--handle output data
+			if tx_active = '0' and sending_fan_data = '1' then
+				case rx_data(2 downto 0) is
+					when "000" =>
+						tx_data <= fans_pulses_sec(7 downto 0);
+					when "001" =>
+						tx_data <= fans_pulses_sec(15 downto 8);
+					when "010" =>
+						tx_data <= fans_pulses_sec(23 downto 16);		
+					when "011" =>
+						tx_data <= fans_pulses_sec(31 downto 24);		
+					when "100" =>
+						tx_data <= fans_pulses_sec(39 downto 32);
+					when "101" =>
+						tx_data <= fans_pulses_sec(47 downto 40);
+					when "110" =>
+						tx_data <= fans_pulses_sec(55 downto 48);
+					when "111" =>
+						tx_data <= fans_pulses_sec(63 downto 56);
+					when others =>
+				end case;
+				
+				fan_data_counter <= fan_data_counter + 1;
+				
+				--if all data is sent, then reseting counter and state
+				if fan_data_counter = 7 then
+					fan_data_counter <= (others=>'0');
+					sending_fan_data <= '0';
+				end if;
+				
+			end if;
+		end if;
+	end process;			
 
 	--Process block handles clk divider logic
 	clk_divider: process(clk)
 	begin
 		if rising_edge(clk) then
+			
+			--reset process
+			if rst = '1' then
+				uart_clk_counter <= (others=>'0');
+				half_sec_counter <= (others=>'0');
+			end if;
+
 			uart_clk_counter <= uart_clk_counter + 1;
 			if uart_clk_counter = 5 then
 				uart_clk_counter <= (others=>'0');	--incrementing uart counter
