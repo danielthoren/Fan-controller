@@ -20,14 +20,45 @@ end fan_controller;
 
 architecture behave of fan_controller is
 
-	signal uart_clk:		std_logic;		--clock for uart logic (6MHz / 5 = 1.2MHz)
+	--Clock signals and dividers
+	signal uart_clk:		std_logic;		--clock for uart logic (6MHz / 5 = 1.2MHz -> 125 clocks per bit at 9600bps)
 	signal uart_clk_counter:	unsigned(2 downto 0);	--counter for uart divider
 	signal half_sec_clk:		std_logic;		--clock with half sec period (2Hz)
 	signal half_sec_counter:	unsigned(20 downto 0);	--counter for clock divider
 
+	--uart signals
+	signal rx_new_data:		std_logic;			--new data available on high flank
+	signal rx_data:			std_logic_vector(7 downto 0);	--data recieved
+
+	signal tx_wr_enable:		std_logic;			--tx_write_enable, write data to tx_data when high
+	signal tx_data:			std_logic_vector(7 downto 0);	--data to be sent
+	signal tx_active:		std_logic;			--high when transmission in progress
+	signal tx_done:			std_logic;			--driven high when transmission complete
+
+	--fan signals
 	signal fans_pwm:		std_logic_vector(7 downto 0);	--internal fans pwm output signal
 	signal fans_duty_cycle:		std_logic_vector(39 downto 0);	--internal fans duty cycle register (5 bits per fan, decimal value 0-21 representing 0-100%)
 	signal fans_pulses_sec:		std_logic_vector(63 downto 0);	--internal fans speed in rotations per seconds
+
+component uart_rx is
+	port(
+			i_Clk:			in std_logic;
+			i_RX_Serial:		in std_logic;
+			o_RX_DV:		out std_logic;				--new data available on high flank
+			O_RX_Byte:		out std_logic_vector(7 downto 0)	--output data
+		);
+end component;
+
+component uart_tx is
+	port(
+			i_Clk:			in std_logic;
+			i_TX_DV:		in std_logic;				--write enable, write new data to out reg if high
+			i_TX_Byte:		in std_logic_vector(7 downto 0);	--output data
+			o_TX_Active:		out std_logic;				--High if transmitting
+			o_TX_Serial:		out std_logic;				--output signal
+			o_TX_Done:		out std_logic				--Driven high when transmit complete, ready to write new value to data reg
+		);
+end component;
 
 component fan is
 	port(
@@ -45,6 +76,24 @@ end component;
 
 begin
 
+	uart_rx_instance: uart_rx
+		port map(
+			i_Clk => uart_clk,
+			i_RX_Serial => i_rx_serial,
+			o_RX_DV	=> rx_new_data,
+			o_RX_Byte => rx_data
+			);
+
+	uart_tx_instance: uart_tx
+		port map(
+			i_Clk => uart_clk,
+			i_TX_DV => tx_wr_enable,
+			i_tx_Byte => tx_data,
+			o_TX_Active => tx_active,
+			o_TX_Serial => o_tx_serial,
+			o_TX_Done => tx_done
+			);
+
 	--declaring all fans
 	fan_0: fan
 		port map(
@@ -56,6 +105,7 @@ begin
 			pwm_signal => o_fans_pwm_sig(0),
 			pulses_sec => fans_pulses_sec(7 downto 0)
 			);
+	
 
 	--Process block handles clk divider logic
 	clk_divider: process(clk)
