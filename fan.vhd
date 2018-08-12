@@ -79,13 +79,14 @@ begin
 	pwm: process(clk, rst)
 	begin
 		if rising_edge(clk) then
-			pwm_counter <= pwm_counter + 1;
+			
 			--Reset if sig 'rst' goes high
 			if rst = '1' then
 				pwm_counter <= (others=>'0');
 				pwm_signal <= '0';
 			end if;
 			
+			pwm_counter <= pwm_counter + 1;
 			if pwm_counter = unsigned(duty_cycle) then
 				pwm_signal <= '0';
 			end if;

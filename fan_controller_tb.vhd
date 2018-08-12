@@ -14,10 +14,10 @@ architecture behave of fan_controller_tb is
   	constant c_BIT_PERIOD : time := 104166 ns;
 
 	signal tb_clk:			std_logic;
-	signal tb_rst:			std_logic;
-	signal tb_i_fans_tacho:		std_logic_vector(7 downto 0);
-	signal tb_o_fans_pwm_sig:	std_logic_vector(7 downto 0);
-	signal tb_o_serial:		std_logic;
+	signal tb_rst:			std_logic := '0';
+	signal tb_i_fans_tacho:		std_logic_vector(7 downto 0) := (others=>'0');
+	signal tb_o_fans_pwm_sig:	std_logic_vector(7 downto 0) := (others=>'0');
+	signal tb_o_serial:		std_logic := '1';
 	signal tb_i_serial:		std_logic;
 
 	--fan input
@@ -62,9 +62,7 @@ architecture behave of fan_controller_tb is
   	  wait for c_BIT_PERIOD;
   	end UART_WRITE_BYTE;
 
-
-	
-	component controller is
+	component fan_controller is
 		port(
 			clk: 		in std_logic;		--6MHz clock
 			rst:		in std_logic;
@@ -87,51 +85,23 @@ begin
 	clk_gen(tb_fans_tacho(0), 14.000);
 	clk_gen(tb_fans_tacho(1), 12.000);
 
-	fan_controller: controller
+	fan_controller1: fan_controller
 		port map(
 				clk => tb_clk,
 				rst => tb_rst,
 				i_fans_tacho => tb_i_fans_tacho,
 				o_fans_pwm_sig => tb_o_fans_pwm_sig,
 				i_rx_serial => tb_o_serial,
-				o_tx_serial => tb_i_serial,
+				o_tx_serial => tb_i_serial
 			);
 
 	process is
 	begin
-	
-	
 
+		wait for c_BIT_PERIOD;
+		uart_write_byte("00001010", tb_o_serial);
 
+  		--assert false report "Tests Complete" severity failure;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-end architecture;
+	end process;
+end behave;
