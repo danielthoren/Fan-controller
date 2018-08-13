@@ -9,7 +9,7 @@ architecture behave of fan_controller_tb is
   	-- Test Bench uses a 12 00 00000 Hz Clock
   	-- Want to interface to 9600 baud UART
   	-- 1200 000 / 9600 = 125 Clocks Per Bit.al
-  	constant c_CLKS_PER_BIT : integer := 125;
+  	constant c_CLKS_PER_BIT : integer := 120;
  
   	constant c_BIT_PERIOD : time := 104166 ns;
 
@@ -99,11 +99,17 @@ begin
 	begin
 
 		wait for c_BIT_PERIOD;
-		uart_write_byte("00001010", tb_o_serial);
+		uart_write_byte("00001010", tb_o_serial);	--Write decimal value 10 to fan 0
 
-		uart_write_byte("00000000", tb_o_serial);
+		wait for c_bit_period;
+		wait for c_bit_period;
 
-  		--assert false report "Tests Complete" severity failure;
+		uart_write_byte("00000101", tb_o_serial);	--write decimal value 5 to fan 0
+
+		wait for c_bit_period;
+		wait for c_bit_period;
+
+  		assert false report "Tests Complete" severity failure;
 
 	end process;
 end behave;

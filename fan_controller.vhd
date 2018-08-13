@@ -26,13 +26,13 @@ architecture behave of fan_controller is
 	--Clock signals and dividers
 	signal pwm_clk:			std_logic := '0';				--clock for pwm generation (6MHz / 12 = 500KHz)
 	signal pwm_clk_counter:		unsigned(2 downto 0) := "000";			--counter for pwm clock
-	signal uart_clk:		std_logic := '0';				--uart_clk, uses signal 'pwm_clk' (500KHz / 10 = 50KHz -> 125 clk/bit at 400 baud rate)
+	signal uart_clk:		std_logic := '0';				--uart_clk, uses signal 'pwm_clk' (500KHz / 10 = 50KHz -> 120 clk/bit at 400 baud rate)
 	signal uart_clk_counter:	unsigned(2 downto 0) := "000";			--counter for uart divider
 	signal half_sec_clk:		std_logic := '0';				--clock with half sec period
 	signal half_sec_counter:	unsigned(21 downto 0) := (others=>'0');		--counter for clock divider
 
 	--uart signals
-	signal rx_new_data:		std_logic := '0';			--new data available on high flank
+	signal rx_new_data:		std_logic := '0';				--new data available on high flank
 	signal rx_data:			std_logic_vector(7 downto 0) := (others=>'0');	--data recieved
 
 	signal tx_wr_enable:		std_logic := '0';				--tx_write_enable, write data to tx_data when high
@@ -41,25 +41,25 @@ architecture behave of fan_controller is
 	signal tx_done:			std_logic := '0';				--driven high when transmission complete
 
 	--fan signals
-	signal fans_pwm:		std_logic_vector(7 downto 0);				--internal fans pwm output signal
+	signal fans_pwm:		std_logic_vector(7 downto 0);							--internal fans pwm output signal
 	signal fans_duty_cycle:		std_logic_vector(39 downto 0) := "0111101111011110111101111011110111101111";	--internal fans duty cycle register (5 bits per fan, decimal value 0-21 representing 0-100%, default value = 15 <=> 75%)
-	signal fans_pulses_sec:		std_logic_vector(63 downto 0);					--internal fans speed in rotations per seconds
+	signal fans_pulses_sec:		std_logic_vector(63 downto 0);							--internal fans speed in rotations per seconds
 	
 component uart_rx is
 	generic (
-      		g_CLKS_PER_BIT : integer := 125   -- Needs to be set correctly
+      		g_CLKS_PER_BIT : integer := 120   -- Needs to be set correctly
       	);
 	port(
 			i_Clk:			in std_logic;
 			i_RX_Serial:		in std_logic;
-			o_RX_DV:		out std_logic;				--new data available on high flank
+			O_RX_DV:		out std_logic;				--new data available on high flank
 			O_RX_Byte:		out std_logic_vector(7 downto 0)	--output data
 		);
 end component;
 
 component uart_tx is
 	generic (
-      		g_CLKS_PER_BIT : integer := 125   -- Needs to be set correctly
+      		g_CLKS_PER_BIT : integer := 120   -- Needs to be set correctly
       	);
 	port(
 			i_Clk:			in std_logic;

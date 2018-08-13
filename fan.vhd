@@ -42,11 +42,14 @@ end fan;
 
 architecture Behavioral of fan is
 
-	signal pwm_counter: 	unsigned(4 downto 0) := "10011";	--Used for PWM output, counts to 20 then restarts
+	signal o_pwm_signal:	std_logic := '1';				--Internal signal for pwm output
 
+	signal pwm_counter: 	unsigned(4 downto 0) := "10011";	--Used for PWM output, counts to 20 then restarts
 	signal tacho_counter: 	unsigned(7 downto 0) := (others=>'0');	--Counts amount of pulses from fan tachometer during halv a second
 
 begin
+
+	pwm_signal <= o_pwm_signal;
 
 	--Process block that measures the amount of times the tachometer pulses during a second. Since there are two pulses per
 	--revolution it is enough to measure a halv second (0.5) and use measured value as rotations per whole second. 
@@ -82,18 +85,18 @@ begin
 			--Reset if sig 'rst' goes high
 			if rst = '1' then
 				pwm_counter <= (others=>'0');
-				pwm_signal <= '0';
+				o_pwm_signal <= '0';
 			end if;
 			
 			pwm_counter <= pwm_counter + 1;
 			if pwm_counter = unsigned(duty_cycle) then
-				pwm_signal <= '0';
+				o_pwm_signal <= '0';
 			end if;
 				
 			if pwm_counter = "10100" then 
-				if not(unsigned(duty_cycle) = 0) then
-				 	pwm_signal <= '1';
-				end if;
+				--if not(unsigned(duty_cycle) = 0) then
+				 	o_pwm_signal <= '1';
+				--end if;
 				pwm_counter <= (others=>'0');
 			end if;
 		
