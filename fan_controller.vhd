@@ -32,18 +32,18 @@ architecture behave of fan_controller is
 	signal half_sec_counter:	unsigned(21 downto 0) := (others=>'0');		--counter for clock divider
 
 	--uart signals
-	signal rx_new_data:		std_logic := '0';		--new data available on high flank
-	signal rx_data:			std_logic_vector(7 downto 0);	--data recieved
+	signal rx_new_data:		std_logic := '0';			--new data available on high flank
+	signal rx_data:			std_logic_vector(7 downto 0) := (others=>'0');	--data recieved
 
-	signal tx_wr_enable:		std_logic;			--tx_write_enable, write data to tx_data when high
-	signal tx_data:			std_logic_vector(7 downto 0);	--data to be sent
-	signal tx_active:		std_logic;			--high when transmission in progress
-	signal tx_done:			std_logic;			--driven high when transmission complete
+	signal tx_wr_enable:		std_logic := '0';				--tx_write_enable, write data to tx_data when high
+	signal tx_data:			std_logic_vector(7 downto 0) := (others=>'0');	--data to be sent
+	signal tx_active:		std_logic := '0';				--high when transmission in progress
+	signal tx_done:			std_logic := '0';				--driven high when transmission complete
 
 	--fan signals
-	signal fans_pwm:		std_logic_vector(7 downto 0);	--internal fans pwm output signal
-	signal fans_duty_cycle:		std_logic_vector(39 downto 0);	--internal fans duty cycle register (5 bits per fan, decimal value 0-21 representing 0-100%)
-	signal fans_pulses_sec:		std_logic_vector(63 downto 0);	--internal fans speed in rotations per seconds
+	signal fans_pwm:		std_logic_vector(7 downto 0);				--internal fans pwm output signal
+	signal fans_duty_cycle:		std_logic_vector(39 downto 0) := "0111101111011110111101111011110111101111";	--internal fans duty cycle register (5 bits per fan, decimal value 0-21 representing 0-100%, default value = 15 <=> 75%)
+	signal fans_pulses_sec:		std_logic_vector(63 downto 0);					--internal fans speed in rotations per seconds
 	
 component uart_rx is
 	generic (
@@ -215,7 +215,7 @@ begin
 			end if;
 
 			
-			if pwm_clk_counter = 6 then
+			if pwm_clk_counter = 5 then
 				pwm_clk_counter <= (others=>'0');
 				pwm_clk <= not pwm_clk;
 			end if;
@@ -237,7 +237,7 @@ begin
 		if rising_edge(pwm_clk) then
 			uart_clk_counter <= uart_clk_counter + 1;
 	
-			if uart_clk_counter = 5 then
+			if uart_clk_counter = 4 then
 				uart_clk_counter <= (others=>'0');
 				uart_clk <= not uart_clk;
 			end if;
@@ -257,7 +257,7 @@ begin
 
 			half_sec_counter <= half_sec_counter + 1;
 	
-			if half_sec_counter = 3000000 then
+			if half_sec_counter = 29999 then
 				half_sec_counter <= (others=>'0');
 				half_sec_clk <= not half_sec_clk;
 			end if;

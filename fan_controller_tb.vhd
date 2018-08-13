@@ -21,7 +21,7 @@ architecture behave of fan_controller_tb is
 	signal tb_i_serial:		std_logic;
 
 	--fan input
-	signal tb_fans_tacho:		std_logic_vector(7 downto 0);
+	signal tb_fans_tacho:		std_logic_vector(7 downto 0) := (others=>'0');
 	signal tb_rx_serial:		std_logic;
 
 	-- Procedure for clock generation
@@ -100,6 +100,8 @@ begin
 
 		wait for c_BIT_PERIOD;
 		uart_write_byte("00001010", tb_o_serial);
+
+		uart_write_byte("00000000", tb_o_serial);
 
   		--assert false report "Tests Complete" severity failure;
 

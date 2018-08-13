@@ -42,8 +42,7 @@ end fan;
 
 architecture Behavioral of fan is
 
-	signal pwm_counter: 	unsigned(4 downto 0) := (others=>'0');	--Used for PWM output, counts to 20 then restarts
-	signal pin_4: 		std_logic := '0';			--True if the connected fan is of 4-pin type
+	signal pwm_counter: 	unsigned(4 downto 0) := "10011";	--Used for PWM output, counts to 20 then restarts
 
 	signal tacho_counter: 	unsigned(7 downto 0) := (others=>'0');	--Counts amount of pulses from fan tachometer during halv a second
 
