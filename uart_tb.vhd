@@ -124,7 +124,13 @@ begin
     wait until rising_edge(r_CLOCK);
     UART_WRITE_BYTE(X"3F", r_RX_SERIAL);
     wait until rising_edge(r_CLOCK);
- 
+
+    if w_RX_DV = '1' then
+	report "w_RX_DV is high, test passed" severity note;
+    else
+	report "w_RX_DV never driven high, test failed" severity note;
+    end if;
+
     -- Check that the correct command was received
     if w_RX_BYTE = X"3F" then
       report "Test Passed - Correct Byte Received" severity note;
