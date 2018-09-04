@@ -115,6 +115,83 @@ begin
 			pwm_signal => o_fans_pwm_sig(0),
 			pulses_sec => fans_pulses_sec(7 downto 0)
 			);
+
+fan_1: fan
+		port map(
+			clk => pwm_clk,
+			rst => rst,
+			half_sec_clk => half_sec_clk,
+			tacho => i_fans_tacho(1),
+			duty_cycle => fans_duty_cycle(10 downto 5),
+			pwm_signal => o_fans_pwm_sig(1),
+			pulses_sec => fans_pulses_sec(15 downto 8)
+			);
+
+fan_2: fan
+		port map(
+			clk => pwm_clk,
+			rst => rst,
+			half_sec_clk => half_sec_clk,
+			tacho => i_fans_tacho(2),
+			duty_cycle => fans_duty_cycle(16 downto 11),
+			pwm_signal => o_fans_pwm_sig(2),
+			pulses_sec => fans_pulses_sec(23 downto 16)
+			);
+
+fan_3: fan
+		port map(
+			clk => pwm_clk,
+			rst => rst,
+			half_sec_clk => half_sec_clk,
+			tacho => i_fans_tacho(3),
+			duty_cycle => fans_duty_cycle(22 downto 17),
+			pwm_signal => o_fans_pwm_sig(3),
+			pulses_sec => fans_pulses_sec(31 downto 24)
+			);
+
+fan_4: fan
+		port map(
+			clk => pwm_clk,
+			rst => rst,
+			half_sec_clk => half_sec_clk,
+			tacho => i_fans_tacho(4),
+			duty_cycle => fans_duty_cycle(27 downto 23),
+			pwm_signal => o_fans_pwm_sig(4),
+			pulses_sec => fans_pulses_sec(39 downto 32)
+			);
+
+fan_5: fan
+		port map(
+			clk => pwm_clk,
+			rst => rst,
+			half_sec_clk => half_sec_clk,
+			tacho => i_fans_tacho(5),
+			duty_cycle => fans_duty_cycle(32 downto 28),
+			pwm_signal => o_fans_pwm_sig(5),
+			pulses_sec => fans_pulses_sec(47 downto 40)
+			);
+
+fan_6: fan
+		port map(
+			clk => pwm_clk,
+			rst => rst,
+			half_sec_clk => half_sec_clk,
+			tacho => i_fans_tacho(6),
+			duty_cycle => fans_duty_cycle(37 downto 33),
+			pwm_signal => o_fans_pwm_sig(6),
+			pulses_sec => fans_pulses_sec(56 downto 48)
+			);
+
+fan_7: fan
+		port map(
+			clk => pwm_clk,
+			rst => rst,
+			half_sec_clk => half_sec_clk,
+			tacho => i_fans_tacho(7),
+			duty_cycle => fans_duty_cycle(42 downto 38),
+			pwm_signal => o_fans_pwm_sig(7),
+			pulses_sec => fans_pulses_sec(64 downto 57)
+			);
 	
 	--Handles input/output logic. Sets the duty cycle of fans from the input data and sends data
 	--on high flank of half_second_clock
