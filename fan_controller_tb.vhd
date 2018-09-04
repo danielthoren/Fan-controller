@@ -11,7 +11,8 @@ architecture behave of fan_controller_tb is
   	-- 1200 000 / 9600 = 125 Clocks Per Bit.al
   	constant c_CLKS_PER_BIT : integer := 120;
  
-  	constant c_BIT_PERIOD : time := 104166 ns;
+  	--constant c_BIT_PERIOD : time := 104166 ns;
+	constant c_BIT_PERIOD : time := 0.01 ms;
 
 	signal tb_clk:			std_logic;
 	signal tb_rst:			std_logic := '0';
@@ -22,7 +23,6 @@ architecture behave of fan_controller_tb is
 
 	--fan input
 	signal tb_fans_tacho:		std_logic_vector(7 downto 0) := (others=>'0');
-	signal tb_rx_serial:		std_logic;
 
 	-- Procedure for clock generation
   	procedure clk_gen(signal clk : out std_logic; constant FREQ : real) is
@@ -101,13 +101,11 @@ begin
 		wait for c_BIT_PERIOD;
 		uart_write_byte("00001010", tb_o_serial);	--Write decimal value 10 to fan 0
 
-		wait for c_bit_period;
-		wait for c_bit_period;
+		wait for c_bit_period * 50;
 
 		uart_write_byte("00000101", tb_o_serial);	--write decimal value 5 to fan 0
 
-		wait for c_bit_period;
-		wait for c_bit_period;
+		wait for c_bit_period * 50;
 
   		assert false report "Tests Complete" severity failure;
 

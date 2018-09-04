@@ -41,7 +41,6 @@ architecture behave of fan_controller is
 	signal tx_done:			std_logic := '0';				--driven high when transmission complete
 
 	--fan signals
-	signal fans_pwm:		std_logic_vector(7 downto 0);							--internal fans pwm output signal
 	signal fans_duty_cycle:		std_logic_vector(39 downto 0) := "0111101111011110111101111011110111101111";	--internal fans duty cycle register (5 bits per fan, decimal value 0-21 representing 0-100%, default value = 15 <=> 75%)
 	signal fans_pulses_sec:		std_logic_vector(63 downto 0);							--internal fans speed in rotations per seconds
 	
@@ -86,8 +85,6 @@ end component;
 	
 
 begin
-
-	o_fans_pwm_sig <= fans_pwm;
 
 	uart_rx_instance: uart_rx
 		port map(
