@@ -18,7 +18,7 @@ architecture behave of fan_controller_tb is
 	signal tb_rst:			std_logic := '0';
 	signal tb_i_fans_tacho:		std_logic_vector(7 downto 0) := (others=>'0');
 	signal tb_o_fans_pwm_sig:	std_logic_vector(7 downto 0) := (others=>'0');
-	signal tb_o_serial:		std_logic;
+	signal tb_o_serial:		std_logic := '1';
 	signal tb_i_serial:		std_logic;
 
 	--fan input
