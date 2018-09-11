@@ -6,14 +6,6 @@ end fan_controller_tb;
 
 architecture behave of fan_controller_tb is
 
-  	-- Test Bench uses a 12 000 000 Hz Clock
-  	-- Want to interface to 9600 baud UART
-  	-- 12 000 000 / 9600 = 1250 Clocks Per Bit.al
-  	constant c_CLKS_PER_BIT : integer := 1250;
- 
-  	--constant c_BIT_PERIOD : time := 104166 ns;
-	constant c_BIT_PERIOD : time := 0.01 ms;
-
 	signal tb_clk:			std_logic;
 	signal tb_rst:			std_logic := '0';
 	signal tb_i_fans_tacho:		std_logic_vector(7 downto 0) := (others=>'0');
@@ -44,7 +36,16 @@ architecture behave of fan_controller_tb is
   	-- Low-level byte-write
   	procedure UART_WRITE_BYTE (
   	  i_data_in       : in  std_logic_vector(7 downto 0);
-  	  signal o_serial : out std_logic) is
+  	  signal o_serial : out std_logic
+		) is
+
+  	-- Test Bench uses a 12 000 000 Hz Clock
+  	-- Want to interface to 9600 baud UART
+  	-- 12 000 000 / 9600 = 1250 Clocks Per Bit.
+  	constant c_CLKS_PER_BIT : integer := 1250;
+
+  	--time per bit := c_CLKS_PER_BIT/freq = 1250/12 000 000 = 0.0001041666 sek = 104.16 us;
+	constant c_BIT_PERIOD : time := 104.16 us;
   	begin
  	
   	  -- Send Start Bit
@@ -79,7 +80,7 @@ architecture behave of fan_controller_tb is
 
 begin
 
-	clk_gen(tb_clk, 1200000.000);
+	clk_gen(tb_clk, 12000000.000);
 
 	--fans tacho speed
 	clk_gen(tb_fans_tacho(0), 14.000);
@@ -99,14 +100,14 @@ begin
 	process is
 	begin
 
-		wait for c_BIT_PERIOD;
+		wait for 10ms;
 		uart_write_byte("00001010", tb_o_serial);	--Write decimal value 10 to fan 0
 
-		wait for 1ms;
+		wait for 10ms;
 
 		uart_write_byte("00000101", tb_o_serial);	--write decimal value 5 to fan 0
 
-		wait for 1ms;
+		wait for 10ms;
 
   		assert false report "Tests Complete" severity failure;
 

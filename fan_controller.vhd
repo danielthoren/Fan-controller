@@ -41,12 +41,12 @@ architecture behave of fan_controller is
 	signal tx_done:			std_logic := '0';				--driven high when transmission complete
 
 	--fan signals
-	signal fans_duty_cycle:		std_logic_vector(39 downto 0) := "0111101111011110111101111011110111101111";	--internal fans duty cycle register (5 bits per fan, decimal value 0-21 representing 0-100%, default value = 15 <=> 75%)
+	signal fans_duty_cycle:		std_logic_vector(39 downto 0) := "0111101111011110111101111011110111101111";	--internal fans duty cycle register (5 bits per fan, decimal value 0-21 representing 0-100%, default value = 15 => 75%)
 	signal fans_pulses_sec:		std_logic_vector(63 downto 0);							--internal fans speed in rotations per seconds
 	
 component uart_rx is
 	generic (
-      		g_CLKS_PER_BIT : integer := 120   -- Needs to be set correctly
+      		g_CLKS_PER_BIT : integer := 1250   -- Needs to be set correctly
       	);
 	port(
 			i_Clk:			in std_logic;
@@ -58,7 +58,7 @@ end component;
 
 component uart_tx is
 	generic (
-      		g_CLKS_PER_BIT : integer := 120   -- Needs to be set correctly
+      		g_CLKS_PER_BIT : integer := 1250   -- Needs to be set correctly
       	);
 	port(
 			i_Clk:			in std_logic;
@@ -116,7 +116,7 @@ begin
 			pulses_sec => fans_pulses_sec(7 downto 0)
 			);
 
-fan_1: fan
+	fan_1: fan
 		port map(
 			clk => pwm_clk,
 			rst => rst,
@@ -127,7 +127,7 @@ fan_1: fan
 			pulses_sec => fans_pulses_sec(15 downto 8)
 			);
 
-fan_2: fan
+	fan_2: fan
 		port map(
 			clk => pwm_clk,
 			rst => rst,
@@ -138,7 +138,7 @@ fan_2: fan
 			pulses_sec => fans_pulses_sec(23 downto 16)
 			);
 
-fan_3: fan
+	fan_3: fan
 		port map(
 			clk => pwm_clk,
 			rst => rst,
@@ -149,7 +149,7 @@ fan_3: fan
 			pulses_sec => fans_pulses_sec(31 downto 24)
 			);
 
-fan_4: fan
+	fan_4: fan
 		port map(
 			clk => pwm_clk,
 			rst => rst,
@@ -160,7 +160,7 @@ fan_4: fan
 			pulses_sec => fans_pulses_sec(39 downto 32)
 			);
 
-fan_5: fan
+	fan_5: fan
 		port map(
 			clk => pwm_clk,
 			rst => rst,
@@ -171,7 +171,7 @@ fan_5: fan
 			pulses_sec => fans_pulses_sec(47 downto 40)
 			);
 
-fan_6: fan
+	fan_6: fan
 		port map(
 			clk => pwm_clk,
 			rst => rst,
@@ -182,7 +182,7 @@ fan_6: fan
 			pulses_sec => fans_pulses_sec(55 downto 48)
 			);
 
-fan_7: fan
+	fan_7: fan
 		port map(
 			clk => pwm_clk,
 			rst => rst,
