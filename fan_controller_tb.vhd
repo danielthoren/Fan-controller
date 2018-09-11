@@ -80,7 +80,7 @@ architecture behave of fan_controller_tb is
 
 begin
 
-	clk_gen(tb_clk, 12000000.000);
+	clk_gen(tb_clk, 6000000.000);
 
 	--fans tacho speed
 	clk_gen(tb_fans_tacho(0), 14.000);
@@ -100,14 +100,14 @@ begin
 	process is
 	begin
 
-		wait for 10ms;
+		wait for 10us;
 		uart_write_byte("00001010", tb_o_serial);	--Write decimal value 10 to fan 0
 
-		wait for 10ms;
+		wait for 10us;
 
 		uart_write_byte("00000101", tb_o_serial);	--write decimal value 5 to fan 0
 
-		wait for 10ms;
+		wait for 10us;
 
   		assert false report "Tests Complete" severity failure;
 

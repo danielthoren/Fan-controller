@@ -25,11 +25,8 @@ architecture behave of fan_controller is
 	
 	--Clock signals and dividers
 	signal pwm_clk:			std_logic := '0';				--clock for pwm generation (6MHz / 12 = 500KHz)
-	signal pwm_clk_counter:		unsigned(2 downto 0) := "000";			--counter for pwm clock
 	signal uart_clk:		std_logic := '0';				--uart_clk, uses signal 'pwm_clk' (500KHz / 10 = 50KHz -> 120 clk/bit at 400 baud rate)
-	signal uart_clk_counter:	unsigned(2 downto 0) := "000";			--counter for uart divider
 	signal half_sec_clk:		std_logic := '0';				--clock with half sec period
-	signal half_sec_counter:	unsigned(21 downto 0) := (others=>'0');		--counter for clock divider
 
 	--uart signals
 	signal rx_new_data:		std_logic := '0';				--new data available on high flank
@@ -214,7 +211,6 @@ begin
 				tx_wr_enable <= '0';
 				tx_data <= (others=>'0');
 				fans_duty_cycle <= (others=>'0');
-				half_sec_counter <= (others=>'0');
 			end if;
 
 			if rx_new_data = '1' then
@@ -278,19 +274,20 @@ begin
 	--Process block handles pwm clock divider. By dividing the 6MHz on board clock by 12 a pwm clock of 500KHz
 	--is gained. One time period is prolonged by a factor of 12, 6 for low flank and 6 for high flank.
 	pwm_clk_divider: process(clk)
+		variable pwm_clk_counter : unsigned(2 downto 0) := (others=>'0');
 	begin
 		if rising_edge(clk) then
-			pwm_clk_counter <= pwm_clk_counter + 1;
+			pwm_clk_counter := pwm_clk_counter + 1;
 			
 			--reset process
 			if rst = '1' then
-				pwm_clk_counter <= (others=>'0');
+				pwm_clk_counter := (others=>'0');
 				pwm_clk <= '0';
 			end if;
 
 			
-			if pwm_clk_counter = 5 then
-				pwm_clk_counter <= (others=>'0');
+			if pwm_clk_counter = 6 then
+				pwm_clk_counter := (others=>'0');
 				pwm_clk <= not pwm_clk;
 			end if;
 		end if;
@@ -298,43 +295,49 @@ begin
 
 	--Process block handles uart clock divider. By dividing the 500KHz internal 'pwm_clk' clock by 10 a uart clock of 50KHz
 	--is gained. One time period is prolonged by a factor of 10, 5 for low flank and 5 for high flank.
-	uart_clk_divider: process(clk, pwm_clk)
+	uart_clk_divider: process(clk)
+		variable pwm_clk_prev	 	: std_logic 		:= '0';
+		variable uart_clk_counter 	: unsigned(3 downto 0) 	:= (others=>'0');
 	begin
 		if rising_edge(clk) then
 			--reset process
 			if rst = '1' then
-				uart_clk_counter <= (others=>'0');
+				uart_clk_counter := (others=>'0');
 				uart_clk <= '0';
-			end if;
-		end if;
-
-		if rising_edge(pwm_clk) then
-			uart_clk_counter <= uart_clk_counter + 1;
+			--detect high flank of pwm_clk, then increment divider variable
+			elsif (pwm_clk = '1' and pwm_clk_prev = '0') then
+				uart_clk_counter := uart_clk_counter + 1;
 	
-			if uart_clk_counter = 4 then
-				uart_clk_counter <= (others=>'0');
-				uart_clk <= not uart_clk;
+				if uart_clk_counter = 5 then
+					uart_clk_counter := (others=>'0');
+					uart_clk <= not uart_clk;
+				end if;
 			end if;
+			pwm_clk_prev := pwm_clk;
 		end if;
 	end process;
 
 	--Process block handles half sec clock divider. By dividing the 50KHz internal 'uart_clk' clock by 25000 a clock of 2Hz
 	--is gained. One time period is prolonged by a factor of 10, 5 for low flank and 5 for high flank.
 	half_sec_clk_divider: process(clk, uart_clk)
+		variable uart_clk_prev		: std_logic		:= '0';
+		variable half_sec_counter 	: unsigned(21 downto 0) := (others=>'0');
 	begin
 		if rising_edge(clk) then
 			--reset process
 			if rst = '1' then
-				half_sec_counter <= (others=>'0');
+				half_sec_counter := (others=>'0');
 				half_sec_clk <= '0';
-			end if;
+			elsif (uart_clk = '1' and uart_clk_prev = '0') then
 
-			half_sec_counter <= half_sec_counter + 1;
+				half_sec_counter := half_sec_counter + 1;
 	
-			if half_sec_counter = 29999 then
-				half_sec_counter <= (others=>'0');
-				half_sec_clk <= not half_sec_clk;
+				if half_sec_counter = 12500 then
+					half_sec_counter := (others=>'0');
+					half_sec_clk <= not half_sec_clk;
+				end if;
 			end if;
+			uart_clk_prev := uart_clk;
 		end if;
 	end process;
 
