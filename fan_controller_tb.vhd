@@ -100,14 +100,14 @@ begin
 	process is
 	begin
 
-		wait for 10us;
+		wait for 10 us;
 		uart_write_byte("00001010", tb_o_serial);	--Write decimal value 10 to fan 0
 
-		wait for 10us;
+		wait for 10 us;
 
 		uart_write_byte("00000101", tb_o_serial);	--write decimal value 5 to fan 0
 
-		wait for 10us;
+		wait for 10 us;
 
   		assert false report "Tests Complete" severity failure;
 

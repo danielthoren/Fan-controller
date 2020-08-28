@@ -65,7 +65,7 @@ begin
 
 	process is
 	begin
-	wait for 1ms;
+	wait for 1 ms;
 	i_duty_cycle <= "00100";	--25% (4)
 	wait for 1 ms;
 	i_duty_cycle <= "01001";	--50% (9)
@@ -73,6 +73,9 @@ begin
 	i_duty_cycle <= "01110";	--75% (14)
 	wait for 1 ms;
 	i_duty_cycle <= "10011";	--100% (19)
+
+        assert false report "Reached end of test";
+        wait;
 
 	end process;
 end behave;

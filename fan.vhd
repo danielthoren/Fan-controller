@@ -42,7 +42,7 @@ end fan;
 
 architecture Behavioral of fan is
 
-	signal o_pwm_signal:	std_logic := '1';				--Internal signal for pwm output
+	signal o_pwm_signal:	std_logic := '1';	                --Internal signal for pwm output
 
 	signal pwm_counter: 	unsigned(4 downto 0) := "10011";	--Used for PWM output, counts to 20 then restarts
 	signal tacho_counter: 	unsigned(7 downto 0) := (others=>'0');	--Counts amount of pulses from fan tachometer during halv a second
@@ -52,7 +52,7 @@ begin
 	pwm_signal <= o_pwm_signal;
 
 	--Process block that measures the amount of times the tachometer pulses during a second. Since there are two pulses per
-	--revolution it is enough to measure a halv second (0.5) and use measured value as rotations per whole second. 
+	--revolution it is enough to measure a half second (0.5) and use measured value as rotations per whole second. 
 	--This is used to calculate the speed of the fan in RPM on the computer side. 
 	--@clk: The clocksignal driving the reset functionality
 	--@half_sec_clk: The clock at which the counter value is written to the output 'pulses_sec' (half a second)
